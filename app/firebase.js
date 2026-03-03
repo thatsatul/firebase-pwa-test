@@ -11,17 +11,29 @@ const firebaseConfig = {
   measurementId: "G-K25D5LCSWR"
 };
 
-const app = initializeApp(firebaseConfig);
-const messaging = typeof window !== 'undefined' ? getMessaging(app) : null;
+let app;
+let messaging = null;
+
+if (typeof window !== 'undefined') {
+  app = initializeApp(firebaseConfig);
+  messaging = getMessaging(app);
+}
 
 export const requestNotificationPermission = async () => {
   if (!messaging) return null;
   
   try {
+    // Register Firebase service worker first
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    console.log('Firebase SW registered:', registration);
+    
     const permission = await Notification.requestPermission();
+    console.log('Notification permission:', permission);
+    
     if (permission === 'granted') {
       const token = await getToken(messaging, {
-        vapidKey: 'BAAjN8hNnut8EgG9A9okszlzrmWC5_t7mhoB2QbCwn3ZD0sPFVI9MrTiVGUHGOL5FmoVRZ2sMhcT7AswlnWawMQ'
+        vapidKey: 'BAAjN8hNnut8EgG9A9okszlzrmWC5_t7mhoB2QbCwn3ZD0sPFVI9MrTiVGUHGOL5FmoVRZ2sMhcT7AswlnWawMQ',
+        serviceWorkerRegistration: registration
       });
       console.log('FCM Token:', token);
       return token;
@@ -36,6 +48,7 @@ export const onMessageListener = () =>
   new Promise((resolve) => {
     if (messaging) {
       onMessage(messaging, (payload) => {
+        console.log('Foreground message received:', payload);
         resolve(payload);
       });
     }
