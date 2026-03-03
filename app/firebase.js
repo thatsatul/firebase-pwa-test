@@ -27,27 +27,28 @@ export const requestNotificationPermission = async () => {
     console.log('Notification permission:', permission);
     
     if (permission === 'granted') {
-      // Wait for service worker to be ready
-      const registration = await navigator.serviceWorker.ready;
-      console.log('Service Worker ready:', registration);
+      // Register Firebase messaging service worker FIRST
+      let firebaseRegistration;
+      if ('serviceWorker' in navigator) {
+        firebaseRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        console.log('Firebase SW registered:', firebaseRegistration);
+        
+        // Wait for it to be active
+        if (firebaseRegistration.installing) {
+          await new Promise(resolve => {
+            firebaseRegistration.installing.addEventListener('statechange', (e) => {
+              if (e.target.state === 'activated') resolve();
+            });
+          });
+        }
+      }
       
-      // Register Firebase messaging with the existing service worker
+      // Get token with Firebase service worker
       const token = await getToken(messaging, {
         vapidKey: 'BAAjN8hNnut8EgG9A9okszlzrmWC5_t7mhoB2QbCwn3ZD0sPFVI9MrTiVGUHGOL5FmoVRZ2sMhcT7AswlnWawMQ',
-        serviceWorkerRegistration: registration
+        serviceWorkerRegistration: firebaseRegistration
       });
-      console.log('FCM Token:', token);
-      
-      // Also register the Firebase messaging service worker
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-          scope: '/firebase-cloud-messaging-push-scope'
-        }).then((reg) => {
-          console.log('Firebase SW registered separately:', reg);
-        }).catch((err) => {
-          console.log('Firebase SW registration failed:', err);
-        });
-      }
+      console.log('FCM Token obtained:', token);
       
       return token;
     }

@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:https": "node server.js",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "start:https": "NODE_ENV=production node server.js"
   },
   "dependencies": {
     "firebase": "^12.10.0",
@@ -15,6 +17,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "mkcert": "^3.2.0",
     "sharp": "^0.34.5"
   }
 }

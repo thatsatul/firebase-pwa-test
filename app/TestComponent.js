@@ -21,8 +21,9 @@ export default function TestComponent() {
   useEffect(() => {
     const setupListener = async () => {
       try {
+        console.log('Setting up foreground message listener...');
         const payload = await onMessageListener();
-        console.log('Foreground notification received:', payload);
+        console.log('✅ Foreground notification received:', payload);
         setNotification(payload.notification);
         
         // Show browser notification even in foreground

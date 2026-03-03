@@ -1,3 +1,5 @@
+import ServiceWorkerRegistration from './ServiceWorkerRegistration';
+
 export const metadata = {
   title: 'PWA Test',
   description: 'Minimal PWA Test App',
@@ -22,7 +24,10 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/icon-192.png" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ServiceWorkerRegistration />
+      </body>
     </html>
   )
 }
