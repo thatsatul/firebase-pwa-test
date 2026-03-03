@@ -2,13 +2,13 @@ import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCm1L_qxgzNYO6xgXTt29vvkHx8k_cO_YE",
-  authDomain: "fir-project-b052b.firebaseapp.com",
-  projectId: "fir-project-b052b",
-  storageBucket: "fir-project-b052b.firebasestorage.app",
-  messagingSenderId: "360732639627",
-  appId: "1:360732639627:web:9a40af7cce3b48c98cef8e",
-  measurementId: "G-K25D5LCSWR"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 let app;
@@ -45,7 +45,7 @@ export const requestNotificationPermission = async () => {
       
       // Get token with Firebase service worker
       const token = await getToken(messaging, {
-        vapidKey: 'BAAjN8hNnut8EgG9A9okszlzrmWC5_t7mhoB2QbCwn3ZD0sPFVI9MrTiVGUHGOL5FmoVRZ2sMhcT7AswlnWawMQ',
+        vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
         serviceWorkerRegistration: firebaseRegistration
       });
       console.log('FCM Token obtained:', token);
