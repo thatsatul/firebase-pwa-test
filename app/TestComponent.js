@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { requestNotificationPermission, onMessageListener } from './firebase';
+import DebugPanel from './DebugPanel';
 
 export default function TestComponent() {
   const [token, setToken] = useState('');
@@ -42,20 +43,23 @@ export default function TestComponent() {
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h1>Test</h1>
-      <button 
-        onClick={handleRequestPermission}
-        style={{
-          padding: '10px 20px',
-          fontSize: '16px',
-          cursor: 'pointer',
-          backgroundColor: '#4CAF50',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px'
-        }}
-      >
-        Enable Notifications
-      </button>
+      <div>
+        <button 
+          onClick={handleRequestPermission}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px'
+          }}
+        >
+          Enable Notifications
+        </button>
+        <DebugPanel />
+      </div>
       
       {token && (
         <div style={{ 
@@ -72,6 +76,9 @@ export default function TestComponent() {
             fontFamily: 'monospace'
           }}>
             {token}
+          </div>
+          <div style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
+            Copy this token and use it in Firebase Console → Cloud Messaging → Send test message
           </div>
         </div>
       )}
