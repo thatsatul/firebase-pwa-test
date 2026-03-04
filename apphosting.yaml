@@ -1,0 +1,39 @@
+# Firebase App Hosting environment variables
+# Docs: https://firebase.google.com/docs/app-hosting/configure#environment-variables
+#
+# Non-sensitive values use "value:" (plain text, committed to repo).
+# Sensitive values use "secret:" — create them first:
+#   firebase apphosting:secrets:set FB_API_KEY
+#   firebase apphosting:secrets:set FB_APP_ID
+#   firebase apphosting:secrets:set FB_VAPID_KEY
+# Then grant access:
+#   firebase apphosting:secrets:grantaccess FB_API_KEY
+#   firebase apphosting:secrets:grantaccess FB_APP_ID
+#   firebase apphosting:secrets:grantaccess FB_VAPID_KEY
+
+env:
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    secret: FB_API_KEY
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: fir-project-b052b.firebaseapp.com
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: fir-project-b052b
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: fir-project-b052b.firebasestorage.app
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "360732639627"
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    secret: FB_APP_ID
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    value: G-K25D5LCSWR
+  - variable: NEXT_PUBLIC_FIREBASE_VAPID_KEY
+    secret: FB_VAPID_KEY
+    availability:
+      - BUILD
+      - RUNTIME
