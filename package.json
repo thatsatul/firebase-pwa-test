@@ -7,10 +7,14 @@
     "dev:https": "node server.js",
     "build": "next build",
     "start": "next start",
-    "start:https": "NODE_ENV=production node server.js"
+    "start:https": "NODE_ENV=production node server.js",
+    "fcm-server": "node server/index.js",
+    "test-send": "node server/test-send.js"
   },
   "dependencies": {
+    "express": "^4.22.1",
     "firebase": "^12.10.0",
+    "googleapis": "^134.0.0",
     "next": "14.1.0",
     "next-pwa": "^5.6.0",
     "react": "^18.2.0",

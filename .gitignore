@@ -8,3 +8,4 @@ certificates/
 .env*.local
 service-account.json
 *-firebase-adminsdk-*.json
+server/placeholders/service-account.json
