@@ -91,9 +91,31 @@ self.addEventListener('install', (event) => {
 // Log notification clicks
 self.addEventListener('notificationclick', (event) => {
   console.log('[SW] 🖱️ Notification clicked:', event.notification.tag);
+  console.log('[SW] Notification data:', event.notification.data);
   event.notification.close();
+  
+  // Build URL with notification data as query params
+  let targetUrl = '/fcm-click';
+  if (event.notification.data) {
+    const params = new URLSearchParams(event.notification.data);
+    targetUrl += '?' + params.toString();
+  }
+  
+  console.log('[SW] Opening URL:', targetUrl);
+  
   event.waitUntil(
-    self.clients.openWindow('/')
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Check if there's already a window open
+      for (const client of clientList) {
+        if (client.url.includes('/fcm-click') && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // No existing window, open a new one
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(targetUrl);
+      }
+    })
   );
 });
 

@@ -23,10 +23,16 @@ function getAccessToken() {
   });
 }
 
-async function sendPushNotification(token, title, body, data = {}) {
+async function sendPushNotification(token, title, body, data = {}, clickUrl = '/fcm-click') {
   try {
     const accessToken = await getAccessToken();
     const projectId = 'fir-project-b052b';
+    
+    // Ensure all data values are strings (FCM requirement)
+    const stringifiedData = {};
+    Object.keys(data).forEach(key => {
+      stringifiedData[key] = String(data[key]);
+    });
     
     const message = {
       message: {
@@ -35,10 +41,10 @@ async function sendPushNotification(token, title, body, data = {}) {
           title: title,
           body: body
         },
-        data: data,
+        data: stringifiedData,
         webpush: {
           fcm_options: {
-            link: '/'
+            link: clickUrl
           }
         }
       }

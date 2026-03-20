@@ -179,7 +179,7 @@ export default function TestComponent() {
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h1>Test</h1>
 
-      {enableNotifications()}
+      {/* {enableNotifications()} */}
       {/* <DiagnosticPanel /> */}
       
       {token && (

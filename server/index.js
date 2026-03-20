@@ -6,7 +6,7 @@ app.use(express.json());
 
 app.post('/send-notification', async (req, res) => {
   try {
-    const { token, title, body, data } = req.body;
+    const { token, title, body, data, clickUrl } = req.body;
     
     if (!token || !title || !body) {
       return res.status(400).json({ 
@@ -14,7 +14,7 @@ app.post('/send-notification', async (req, res) => {
       });
     }
 
-    const result = await sendPushNotification(token, title, body, data);
+    const result = await sendPushNotification(token, title, body, data, clickUrl);
     res.json({ success: true, result });
   } catch (error) {
     res.status(500).json({ 
