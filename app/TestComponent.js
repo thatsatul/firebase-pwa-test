@@ -38,6 +38,38 @@ export default function TestComponent() {
     }
   };
 
+  // Auto-request FCM token on page load
+  useEffect(() => {
+    const autoRequestToken = async () => {
+      addLog('🔄 Auto-requesting FCM token on page load...');
+      
+      // Check if notification permission is already granted
+      if (Notification.permission === 'granted') {
+        addLog('✅ Notification permission already granted, getting token...');
+        const fcmToken = await requestNotificationPermission();
+        if (fcmToken) {
+          setToken(fcmToken);
+          addLog(`✅ Token obtained: ${fcmToken.substring(0, 30)}...`);
+          // Auto-copy to clipboard
+          if (navigator.clipboard) {
+            try {
+              await navigator.clipboard.writeText(fcmToken);
+              addLog('📋 Token copied to clipboard');
+            } catch (e) {
+              addLog('⚠️ Could not copy to clipboard');
+            }
+          }
+        }
+      } else if (Notification.permission === 'default') {
+        addLog('⚠️ Notification permission not yet granted. Click "Enable Notifications" button.');
+      } else {
+        addLog('❌ Notification permission denied');
+      }
+    };
+    
+    autoRequestToken();
+  }, []);
+
   useEffect(() => {
     const setupListener = async () => {
       try {
@@ -61,67 +93,9 @@ export default function TestComponent() {
     setupListener();
   }, []);
 
-  return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1>Test</h1>
-      <div>
-        <button 
-          onClick={handleRequestPermission}
-          style={{
-            padding: '10px 20px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px'
-          }}
-        >
-          Enable Notifications
-        </button>
-        <DebugPanel />
-      </div>
-      
-      <DiagnosticPanel />
-      
-      {token && (
-        <div style={{ 
-          marginTop: '20px', 
-          padding: '10px', 
-          backgroundColor: '#f0f0f0',
-          borderRadius: '4px'
-        }}>
-          <strong>FCM Token:</strong>
-          <div style={{ 
-            fontSize: '12px', 
-            wordBreak: 'break-all',
-            marginTop: '5px',
-            fontFamily: 'monospace'
-          }}>
-            {token}
-          </div>
-          <div style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
-            Copy this token and use it in Firebase Console → Cloud Messaging → Send test message
-          </div>
-        </div>
-      )}
-      
-      {notification && (
-        <div style={{ 
-          marginTop: '20px', 
-          padding: '10px', 
-          backgroundColor: '#e7f3ff',
-          borderRadius: '4px',
-          border: '1px solid #2196F3'
-        }}>
-          <strong>Last Notification:</strong>
-          <div style={{ marginTop: '5px' }}>
-            <strong>{notification.title}</strong>
-            <p>{notification.body}</p>
-          </div>
-        </div>
-      )}
-      
+
+  const gcmConnectionHelper = () => {
+    return <>
       {/* GCM Connection Helper */}
       <div style={{ 
         marginTop: '20px', 
@@ -178,6 +152,74 @@ export default function TestComponent() {
           ))}
         </div>
       )}
+    </>
+  }
+
+  const enableNotifications = () => {
+    return <div>
+      <button 
+        onClick={handleRequestPermission}
+        style={{
+          padding: '10px 20px',
+          fontSize: '16px',
+          cursor: 'pointer',
+          backgroundColor: '#4CAF50',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px'
+        }}
+      >
+        Enable Notifications
+      </button>
+      {/* <DebugPanel /> */}
+    </div>;
+  };
+
+  return (
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <h1>Test</h1>
+
+      {enableNotifications()}
+      {/* <DiagnosticPanel /> */}
+      
+      {token && (
+        <div style={{ 
+          marginTop: '20px', 
+          padding: '10px', 
+          backgroundColor: '#f0f0f0',
+          borderRadius: '4px'
+        }}>
+          <strong>FCM Token:</strong>
+          <div style={{ 
+            fontSize: '12px', 
+            wordBreak: 'break-all',
+            marginTop: '5px',
+            fontFamily: 'monospace'
+          }}>
+            {token}
+          </div>
+          <div style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
+            Copy this token and use it in Firebase Console → Cloud Messaging → Send test message
+          </div>
+        </div>
+      )}
+      
+      {notification && (
+        <div style={{ 
+          marginTop: '20px', 
+          padding: '10px', 
+          backgroundColor: '#e7f3ff',
+          borderRadius: '4px',
+          border: '1px solid #2196F3'
+        }}>
+          <strong>Last Notification:</strong>
+          <div style={{ marginTop: '5px' }}>
+            <strong>{notification.title}</strong>
+            <p>{notification.body}</p>
+          </div>
+        </div>
+      )}
+      {/* {gcmConnectionHelper()} */}
     </div>
   );
 }
