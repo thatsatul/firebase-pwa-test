@@ -68,8 +68,9 @@ messaging.onBackgroundMessage((payload) => {
     icon: '/icon-192.png',
     badge: '/icon-192.png',
     data: payload.data,
-    tag: 'fcm-notification-' + Date.now(),
-    requireInteraction: true
+    tag: 'fcm-' + Date.now() + '-' + Math.random(), // Unique tag to show multiple notifications
+    requireInteraction: false, // Allow notifications to auto-dismiss
+    renotify: true // Show notification even if tag exists
   };
 
   console.log('[SW] Showing notification:', notificationTitle, notificationOptions);

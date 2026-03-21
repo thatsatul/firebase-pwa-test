@@ -9,11 +9,87 @@ export default function TestComponent() {
   const [token, setToken] = useState('');
   const [notification, setNotification] = useState(null);
   const [logs, setLogs] = useState([]);
+  const [userId, setUserId] = useState('');
 
   const addLog = (msg) => {
     const timestamp = new Date().toLocaleTimeString();
     setLogs(prev => [...prev, `[${timestamp}] ${msg}`]);
     console.log(msg);
+  };
+
+  const onUserButtonClick = async (userId) => {
+    setUserId(userId);
+    addLog(`🔔 Mapping User ${userId} to FCM token...`);
+    
+    if (!token) {
+      addLog('❌ No FCM token available. Please enable notifications first.');
+      alert('Please enable notifications first!');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3001/map-user-fcm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userId,
+          fcmToken: token
+        })
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        addLog(`✅ User ${userId} successfully mapped to FCM token`);
+        alert(`${userId} logged in successfully! You can now send notifications to this user.`);
+      } else {
+        addLog(`❌ Failed to map user: ${result.error}`);
+        alert(`Error: ${result.error}`);
+      }
+    } catch (error) {
+      addLog(`❌ Error calling map-user-fcm API: ${error.message}`);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  const getButtonStyle = (isActive) => ({
+    padding: '10px 20px',
+    margin: '5px',
+    fontSize: '14px',
+    cursor: 'pointer',
+    border: isActive ? '2px solid #45a049' : '1px solid #ddd',
+    borderRadius: '4px',
+    backgroundColor: isActive ? '#4CAF50' : '#f0f0f0',
+    color: isActive ? 'white' : '#000',
+    fontWeight: isActive ? 'bold' : 'normal',
+    transition: 'all 0.3s ease',
+  });
+
+  const userMapRender = () => {
+    return (
+      <div>
+        <button 
+          style={getButtonStyle(userId === 'user1')} 
+          onClick={() => onUserButtonClick('user1')}
+        >
+          User 1
+        </button>
+        <button 
+          style={getButtonStyle(userId === 'user2')} 
+          onClick={() => onUserButtonClick('user2')}
+        >
+          User 2
+        </button>
+        <button 
+          style={getButtonStyle(userId === 'user3')} 
+          onClick={() => onUserButtonClick('user3')}
+        >
+          User 3
+        </button>
+      </div>
+    );
   };
 
   const handleRequestPermission = async () => {
@@ -71,25 +147,34 @@ export default function TestComponent() {
   }, []);
 
   useEffect(() => {
-    const setupListener = async () => {
-      try {
-        console.log('Setting up foreground message listener...');
-        const payload = await onMessageListener();
-        console.log('✅ Foreground notification received:', payload);
-        setNotification(payload.notification);
-        
-        // Show browser notification even in foreground
-        if (Notification.permission === 'granted') {
-          new Notification(payload.notification.title, {
-            body: payload.notification.body,
-            icon: '/icon-192.png'
-          });
-        }
-      } catch (err) {
-        console.log('Listener error:', err);
-      }
+    const setupListener = () => {
+      onMessageListener()
+        .then((payload) => {
+          console.log('✅ Foreground notification received:', payload);
+          addLog(`📬 Notification received: ${payload.notification?.title}`);
+          setNotification(payload.notification);
+          
+          // Show browser notification even in foreground
+          if (Notification.permission === 'granted') {
+            new Notification(payload.notification.title, {
+              body: payload.notification.body,
+              icon: '/icon-192.png',
+              tag: 'fcm-' + Date.now(), // Unique tag for each notification
+              requireInteraction: false
+            });
+          }
+          
+          // Set up listener again for next message
+          setupListener();
+        })
+        .catch((err) => {
+          console.log('Listener error:', err);
+          // Set up listener again even on error
+          setupListener();
+        });
     };
     
+    console.log('Setting up foreground message listener...');
     setupListener();
   }, []);
 
@@ -178,8 +263,9 @@ export default function TestComponent() {
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h1>Test</h1>
+      {userMapRender()}
 
-      {/* {enableNotifications()} */}
+      {enableNotifications()}
       {/* <DiagnosticPanel /> */}
       
       {token && (
